@@ -625,3 +625,89 @@ html, body {
 .highlight, .highlight .w {
   background-color: $code-bg;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+.content pre,
+.content blockquote {
+  color: #fff;
+  margin: 0;
+  width: 50%;
+  float: right;
+  clear: right;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.4);
+}
+.content pre>p,
+.content blockquote>p {
+  margin: 0;
+}
+.content pre a,
+.content blockquote a {
+  color: #fff;
+  text-decoration: none;
+  border-bottom: dashed 1px #ccc;
+}
+.content pre {
+  padding: 0 28px 10px 28px;
+}
+.content pre code {
+  display: block;
+  background-color: #212429;
+  padding: 20px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -o-border-radius: 4px;
+  -ms-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: rgba(0,0,0,0.2) 0 0 2px inset;
+  -moz-box-shadow: rgba(0,0,0,0.2) 0 0 2px inset;
+  -o-box-shadow: rgba(0,0,0,0.2) 0 0 2px inset;
+  -ms-box-shadow: rgba(0,0,0,0.2) 0 0 2px inset;
+  box-shadow: rgba(0,0,0,0.2) 0 0 2px inset;
+  line-height: 1.5;
+  font-size: 12px;
+  font-family: "Monaco", "consolas", monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.content blockquote {
+  padding: 20px 28px;
+}
+.content blockquote>p {
+  color: #dadfe3;
+  text-shadow: rgba(0,0,0,0.9) 0 1px 0;
+}
+.content blockquote img {
+  margin: 1em 0;
+}
+
+h1 {
+  font-size: 3em !important;
+}
+h2 {
+  font-size: 2.2em !important;
+}
+
+body p {
+  font-size: 1.2em !important;
+}
+
+.content blockquote > p {
+  font-size: 1.4em;
+  background-color: transparent;
+  border-style: none;
+}

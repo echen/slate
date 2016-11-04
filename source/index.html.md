@@ -1,15 +1,11 @@
 ---
-title: API Reference
+title: Hybrid API
 
 language_tabs:
   - shell
-  - ruby
-  - python
-  - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
+  - <a href='https://www.gethybrid.io/poster_sign_up'>Sign up on Hybrid</a>
 
 includes:
   - errors
@@ -19,171 +15,385 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
-
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
+Welcome to the Hybrid API!
 
 # Authentication
 
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+> To authorize, use this code. Note that the colon is not part of the API key, but follows it.
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+curl {{API_ENDPOINT}}
+  -u {{YOUR_API_KEY}}:
 ```
 
-```javascript
-const kittn = require('kittn');
+Hybrid uses API keys to allow access to the API. You can find your API key in [your profile](https://www.gethybrid.io/me).
 
-let api = kittn.authorize('meowmeowmeow');
-```
+Authentication is performed via [HTTP Basic Auth](http://en.wikipedia.org/wiki/Basic_access_authentication). Your API key is your basic auth username, and you do not need to provide a password.
 
-> Make sure to replace `meowmeowmeow` with your API key.
+If you need to authenticate via bearer auth (e.g., for a cross-origin request), use
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+(TODO: is Bearer needed?)
+`-H "Authorization: Bearer {{YOUR_API_KEY}}:"`
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+instead of `-u {{YOUR_API_KEY}}:`.
 
-`Authorization: meowmeowmeow`
+# Projects
 
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
+## The project object
 
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+> Example Response
 
 ```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+{
+  "id": "17e323f1-f7e4-427c-a2d5-456743aba8",
+  "callback_url": "https://www.mywebsite.com/hybrid_callback",
+  "name": "Categorize this website",
+  "num_tasks": 1000,
+  "num_tasks_completed": 239,
+  "num_workers_per_task": 1,
+  "payment_per_response": 0.1,
+  "status": "unlaunched"
+}
 ```
 
-```javascript
-const kittn = require('kittn');
+Parameter | Type | Description
+--------- | ---- | -----------
+id | string |
+callback_url | string | Once a task is completed, it is POSTed to this url.
+created_at | string |
+name | string | Name you gave this project.
+num_tasks | integer | Number of tasks in this project.
+num_tasks_completed | integer | Number of completed tasks.
+num_workers_per_task | integer | How many workers work on each task (i.e., how many response per task).
+payment_per_response | float | How much a worker is paid (in US dollars) for an individual response.
+status | string | One of `unlaunched`, `in_progress`, `completed`, `canceled`, or `paused`.
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+## Create a project
+
+> Definition
+
+```
+POST https://www.gethybrid.io/api/projects
 ```
 
-> The above command returns JSON structured like this:
+> Example Request
+
+```shell
+curl https://www.gethybrid.io/api/projects/17e323f1-f7e4-427c-a2d5-456743aba8
+  -u {{YOUR_API_KEY}}:
+```
+
+> Example Response
+
+```json
+{
+  "id": "17e323f1-f7e4-427c-a2d5-456743aba8",
+  "callback_url": "https://www.mywebsite.com/hybrid_callback",
+  "name": "Categorize this website",
+  "num_tasks": 1000,
+  "num_tasks_completed": 239,
+  "num_workers_per_task": 1,
+  "payment_per_response": 0.1,
+  "status": "unlaunched"
+}
+```
+
+Creates a project.
+
+### Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+name | string | Name to give your project. (required)
+payment_per_response | float | Amount in dollars to pay workers for each response. (required)
+template | array | ... (required) TODO
+callback_url | string | URL where completed tasks will be POSTed. (optional, default null)
+num_workers_per_task | integer | Number of workers who work on each task. (optional, default 1)
+
+## List all projects
+
+> Definition
+
+```
+GET https://www.gethybrid.io/api/projects
+```
+
+> Example Request
+
+```shell
+curl https://www.gethybrid.io/api/projects
+  -u {{YOUR_API_KEY}}:
+```
+
+> Example Response
 
 ```json
 [
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+    "id": "17e323f1-f7e4-427c-a2d5-456743aba8",
+    "callback_url": "https://www.mywebsite.com/hybrid_callback",
+    "name": "Categorize customer websites",
+    "num_tasks": 1000,
+    "num_tasks_completed": 239,
+    "num_workers_per_task": 1,
+    "payment_per_response": 0.1,
+    "status": "unlaunched"
   },
   {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+    "id": "81533541-0359-4d4b-a545-af38a2cb3e8c",
+    "callback_url": null,
+    "name": "Label product images",
+    "num_tasks": 5000,
+    "num_tasks_completed": 4315,
+    "num_workers_per_task": 1,
+    "payment_per_response": 0.25,
+    "status": "in_progress"
   }
 ]
 ```
 
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
+Lists all projects you have created.
 
 ### Query Parameters
 
 Parameter | Default | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+cursor | TODO | TODO
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
+## Retrieve a project
 
-## Get a Specific Kitten
+> Definition
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
+```
+GET https://www.gethybrid.io/api/projects/{{PROJECT_ID}}
 ```
 
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
+> Example Request
 
 ```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
+curl https://www.gethybrid.io/api/projects/17e323f1-f7e4-427c-a2d5-456743aba8
+  -u {{YOUR_API_KEY}}:
 ```
 
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
+> Example Response
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+  "id": "17e323f1-f7e4-427c-a2d5-456743aba8",
+  "callback_url": "https://www.mywebsite.com/hybrid_callback",
+  "name": "Categorize this website",
+  "num_tasks": 1000,
+  "num_tasks_completed": 239,
+  "num_workers_per_task": 1,
+  "payment_per_response": 0.1,
+  "status": "unlaunched"
 }
 ```
 
-This endpoint retrieves a specific kitten.
+Retrieves a specific project you have created.
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+# Tasks
 
-### HTTP Request
+## The task object
 
-`GET http://example.com/kittens/<ID>`
+> Example Response
 
-### URL Parameters
+```shell
+{
+  "id": "38da6bc5-a644-41b9-a964-4678bc7375c6",
+  "project_id": "b31ede78-afdf-4938-b775-8813453c7fc5",
+  "created_at": "2016-11-01T18:56:56.000Z",
+  "is_complete": true,
+    
+  "data": {
+    "company": "Hybrid",
+    "city": "San Francisco",
+    "state": "CA"
+  },
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+  "responses": [
+    {
+      "created_at": "2016-11-01T23:29:17.971Z",
+      "id": "1befb37b-8e4f-42b6-8a61-2c946ad4b5ce",
+      "response_data": {
+        "website": "https://www.gethybrid.io",
+        "category": "Technology"
+      }
+    }
+  ]
+}
+```
 
+Parameter | Type | Description
+--------- | ---- | -----------
+id | string |
+created_at | string |
+project_id | string | ID of the project that this task belongs to.
+is_complete | boolean | Whether or not this task has received the desired number of responses (equal to the project's `num_workers_per_task` field).
+data | dictionary | A dictionary of named fields that get shown (according to the project template) to workers when working on the task.
+responses | array | An array of responses to the task. Each response... TODO
+
+## Create a task
+
+> Definition
+
+```
+POST https://www.gethybrid.io/api/projects/{{PROJECT_ID}}/tasks
+```
+
+> Example Request
+
+```shell
+curl https://www.gethybrid.io/api/projects/17e323f1-f7e4-427c-a2d5-456743aba8/tasks
+  -u {{YOUR_API_KEY}}:
+  -d data=...TODO...
+  
+```
+
+> Example Response
+
+```json
+{
+  "id": "38da6bc5-a644-41b9-a964-4678bc7375c6",
+  "project_id": "b31ede78-afdf-4938-b775-8813453c7fc5",
+  "created_at": "2016-11-01T18:56:56.000Z",
+  "is_complete": false,
+    
+  "data": {
+    "company": "Hybrid",
+    "city": "San Francisco",
+    "state": "CA"
+  },
+
+  "responses": []
+}
+```
+
+Creates a task. By default, the project is launched... TODO
+
+### Parameters
+
+Parameter | Type | Description
+--------- | ---- | -----------
+data | dictionary | A dictionary of named fields that get shown (according to the project template) to workers when working on the task. (required)
+
+## List all tasks
+
+> Definition
+
+```
+GET https://www.gethybrid.io/api/projects/{{PROJECT_ID}}/tasks
+```
+
+> Example Request
+
+```shell
+curl https://www.gethybrid.io/api/projects/b31ede78-afdf-4938-b775-8813453c7fc5/tasks
+  -u {{YOUR_API_KEY}}:
+```
+
+> Example Response
+
+```json
+[
+  {
+    "id": "38da6bc5-a644-41b9-a964-4678bc7375c6",
+    "project_id": "b31ede78-afdf-4938-b775-8813453c7fc5",
+    "created_at": "2016-11-01T18:56:56.000Z",
+    "is_complete": true,
+    
+    "data": {
+      "company": "Hybrid",
+      "city": "San Francisco",
+      "state": "CA"
+    },
+
+    "responses": [
+      {
+        "created_at": "2016-11-01T23:29:17.971Z",
+        "id": "1befb37b-8e4f-42b6-8a61-2c946ad4b5ce",
+        "response_data": {
+          "website": "https://www.gethybrid.io",
+          "category": "Technology"
+        }
+      }
+    ]
+  },
+  {
+    "id": "dd66e80a-88b3-4c4f-9efc-2aca8eed73db",
+    "project_id": "b31ede78-afdf-4938-b775-8813453c7fc5",
+    "created_at": "2016-11-01T23:23:26.016Z",
+    "is_complete": true,
+
+    "data": {
+      "company": "Google",
+      "city": "Mountain View",
+      "state": "CA"
+    },
+
+    "responses": [
+      {
+        "created_at": "2016-11-01T23:22:19.124Z",
+        "id": "cc9f4263-1d0f-4730-a97e-199851b6ade5",
+        "response_data": {
+          "website": "https://www.google.com",
+          "category": "Technology"
+        }
+      }
+    ]
+  }
+]
+```
+
+Lists all tasks belonging to a project.
+
+### Query Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+cursor | TODO | TODO
+
+## Retrieve a task
+
+> Definition
+
+```
+GET https://www.gethybrid.io/api/tasks/{{TASK_ID}}
+```
+
+> Example Request
+
+```shell
+curl https://www.gethybrid.io/api/tasks/38da6bc5-a644-41b9-a964-4678bc7375c6
+  -u {{YOUR_API_KEY}}:
+```
+
+> Example Response
+
+```json
+{
+  "id": "38da6bc5-a644-41b9-a964-4678bc7375c6",
+  "project_id": "b31ede78-afdf-4938-b775-8813453c7fc5",
+  "created_at": "2016-11-01T18:56:56.000Z",
+  "is_complete": true,
+  
+  "data": {
+    "company": "Hybrid",
+    "city": "San Francisco",
+    "state": "CA"
+  },
+
+  "responses": [
+    {
+      "created_at": "2016-11-01T23:29:17.971Z",
+      "id": "1befb37b-8e4f-42b6-8a61-2c946ad4b5ce",
+      "response_data": {
+        "website": "https://www.gethybrid.io",
+        "category": "Technology"
+      }
+    }
+  ]
+}
+```
+
+Retrieves a specific task you have created.
